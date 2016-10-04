@@ -5,5 +5,7 @@ target
 /.classpath
 /.project
 /.settings
+/.cache-main
+/.cache-tests
 /RUNNING_PID
 /bin/
