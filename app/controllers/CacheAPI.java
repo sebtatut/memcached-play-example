@@ -1,5 +1,7 @@
 package controllers;
 
+import java.util.concurrent.CompletionStage;
+
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -43,8 +45,8 @@ public class CacheAPI extends Controller {
 		return ok();
 	}
 	
-	public Result getMemcached(final String key) {
-		final String obj = memcached.get(key);
-		return ok(Json.parse(obj));
+	public CompletionStage<Result> getMemcached(final String key) {
+		return memcached.get(key)
+				.thenApplyAsync(obj -> ok(Json.parse((String) obj)));
 	}
 }

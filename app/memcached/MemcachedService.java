@@ -1,5 +1,7 @@
 package memcached;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -23,15 +25,17 @@ public class MemcachedService implements Memcached {
 	
 	
 	@Override
-	public <T> T get(String key) {
-		final Future<Object> future = client.asyncGet(key);
-		try {
-			return (T) future.get(1, TimeUnit.SECONDS);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			Logger.error("BUMMER!", e);
-			future.cancel(true);
-			throw new RuntimeException(e);
-		}
+	public <T> CompletionStage<T> get(String key) {
+		return CompletableFuture.supplyAsync(() -> {
+			final Future<Object> future = client.asyncGet(key);
+			try {
+				return (T) future.get(1, TimeUnit.SECONDS);
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
+				Logger.error("BUMMER!", e);
+				future.cancel(true);
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	@Override
